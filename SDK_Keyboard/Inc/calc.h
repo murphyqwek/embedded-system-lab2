@@ -1,12 +1,16 @@
 #ifndef CALC
 #define CALC
 
-void setOperation(char operation);
+void printOperation(char operation);
 void printNum(int num);
-char getPressedButton(void);
+int getPressedButton(void);
+
+void clearWhenPressed(void);
+
 
 void cycle(void);
-void enterNumber(int step);
+void enterNumber(int* step);
+void getOperation(void);
 void calculation(void);
 void clearResult(void);
 
