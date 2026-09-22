@@ -23,6 +23,7 @@
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
+#include "calc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -108,7 +109,7 @@ int main(void)
   while (1)
   {
 	  cycle();
-	  HAL_Delay(500);
+	  HAL_Delay(25);
 
   }
   /* USER CODE END 3 */

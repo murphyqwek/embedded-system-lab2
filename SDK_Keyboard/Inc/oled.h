@@ -23,6 +23,8 @@ typedef struct {
 
 extern I2C_HandleTypeDef OLED_I2C_PORT;
 
+void oled_Reset(void);
+
 uint8_t oled_Init(void);
 void oled_Fill(OLED_COLOR color);
 void oled_UpdateScreen(void);

@@ -10,14 +10,14 @@ int getKey() {
             case 0x01: return i*3+1; 
             case 0x02: return i*3+2;
             case 0x04: return i*3+3;
-            default: return -1;
+            default: break;
         }
     }
 }
 
 int getPressedButton() {
     prevKey = key;
-    int key = getKey();
+    key = getKey();
 
     if (key != prevKey) {
         if (key == 11) {
