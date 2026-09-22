@@ -3,20 +3,47 @@
 #include "oled.h"
 #include "kb.h"
 #include "usart.h"
+#include "utils.h"
 
 
 int state = 0;
 int op1 = 0;
 int op2 = 0;
+char str[12];
 
 char operation = '+';
 
-void cycle(void) {
-	if(state == 0 || state == 1) {
+void cycle() {
+
+	oled_Reset();
+	
+	if (state == 0) {
+		oled_WriteString("Enter operand1: ", Font_7x10, White);
+
+		int length = snprintf(str, sizeof(str), "%d", number);
+		oled_SetCursor(127 - length*7, 15);
+		oled_WriteString(str, Font_7x10, White);
+
+		enterNumber(&state);
+	}
+
+	if (state == 1) {
+		oled_WriteString("Enter operand2: ", Font_7x10, White);
+
+		int length = snprintf(str, sizeof(str), "%d", number);
+		oled_SetCursor(127 - length*7, 15);
+		oled_WriteString(str, Font_7x10, White);
+
 		enterNumber(&state);
 	}
 
 	if(state == 2) {
+		oled_WriteString("Enter operation: ", Font_7x10, White);
+
+		int length = snprintf(str, sizeof(str), "%d", number);
+		oled_SetCursor(60, 15);
+		oled_WriteChar(operation, Font_7x10, White);
+
 		getOperation();
 	}
 
@@ -29,12 +56,11 @@ void cycle(void) {
 	}
 }
 
+
 void clearWhenPressed() {
 	int button = getPressedButton();
 
 	if(button != 0) {
-		//очищаем экран и принтуем ввод первого числа
-
 		state = 0;
 	}
 }
@@ -69,6 +95,15 @@ void calculation() {
 	state++;
 
 
+}
+
+void printNum(int result) {
+	oled_WriteString("Enter result: ", Font_7x10, White);
+
+	int length = snprintf(str, sizeof(str), "%d", number);
+
+	oled_SetCursor(127 - length*7, 15);
+	oled_WriteString(str, Font_7x10, White);
 }
 
 void getOperation() {
@@ -118,6 +153,8 @@ void enterNumber(int* state) {
 		return;
 	}
 
-	(*state)++;
+	if (button == 11) {
+		(*state)++;
+		return;
+	}
 }
-
