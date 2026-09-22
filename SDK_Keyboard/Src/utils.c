@@ -13,6 +13,7 @@ int getKey() {
             default: break;
         }
     }
+    return -1;
 }
 
 int getPressedButton() {
