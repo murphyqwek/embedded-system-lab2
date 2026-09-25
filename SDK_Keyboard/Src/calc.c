@@ -5,6 +5,8 @@
 #include "usart.h"
 #include "utils.h"
 #include <stdio.h>
+#include <limits.h>
+#include <stdint.h>
 
 
 int state = 0;
@@ -14,41 +16,26 @@ char str[12];
 
 char operation = '+';
 
-void cycle() {
+void cycle(void)
+{
+    switch (state) {
+        case 0:
+        case 1:
+            enterNumber(&state);
+            break;
 
-	oled_Reset();
+        case 2:
+            getOperation();
+            break;
 
-	if (state == 0) {
-		oled_WriteString("Enter operand1: ", Font_7x10, White);
+        case 3:
+            calculation();
+            break;
 
-		int length = snprintf(str, sizeof(str), "%d", op1);
-		oled_SetCursor(127 - length*7, 15);
-		oled_WriteString(str, Font_7x10, White);
-
-		enterNumber(&state);
-	}
-
-	if (state == 1) {
-		oled_WriteString("Enter operand2: ", Font_7x10, White);
-
-		int length = snprintf(str, sizeof(str), "%d", op2);
-		oled_SetCursor(127 - length*7, 15);
-		oled_WriteString(str, Font_7x10, White);
-
-		enterNumber(&state);
-	}
-
-	if(state == 2) {
-		getOperation();
-	}
-
-	if(state == 3) {
-		calculation();
-	}
-
-	if(state == 4) {
-		clearWhenPressed();
-	}
+        case 4:
+            clearWhenPressed();
+            break;
+    }
 }
 
 void clearWhenPressed() {
@@ -56,48 +43,54 @@ void clearWhenPressed() {
 
 	if(button >= 0) {
 		state = 0;
+		op1 = 0;
+		op2 = 0;
+		operation = '+';
+		oled_Fill(Black);
+		printOperand(1, op1);
 	}
 }
 
-void calculation() {
-	int result = 0;
+void calculation(void)
+{
+    int64_t result = 0;
 
-	switch(operation) {
-		case '+':
-			result = op1 + op2;
-			break;
+    switch (operation) {
+        case '+':
+            result = (int64_t)op1 + op2;
+            break;
 
-		case '-':
-			result = op1 - op2;
-			break;
+        case '-':
+            result = (int64_t)op1 - op2;
+            break;
 
-		case '*' :
-			result = op1 * op2;
-			break;
+        case '*':
+            result = (int64_t)op1 * op2;
+            break;
 
-		case '/' :
-			//сделать проверку на деление на 0
+        case '/':
+            if (op2 == 0) {
+                printError("Division by zero");
+                state = 4;
+                return;
+            }
 
-			result = op1 / op2;
-			break;
-	}
+            result = (int64_t)op1 / op2;
+            break;
 
+        default:
+            printError("Invalid operation");
+            state = 4;
+            return;
+    }
 
-	printNum(result);
+    if (result < INT_MIN || result > INT_MAX) {
+        printError("Integer overflow");
+    } else {
+        printResult((int)result);
+    }
 
-
-	state++;
-
-
-}
-
-void printNum(int result) {
-	oled_WriteString("Enter result: ", Font_7x10, White);
-
-	int length = snprintf(str, sizeof(str), "%d", result);
-
-	oled_SetCursor(127 - length*7, 15);
-	oled_WriteString(str, Font_7x10, White);
+    state = 4;
 }
 
 void getOperation() {
@@ -119,43 +112,52 @@ void getOperation() {
 			break;
 
 		case 11:
-			state++;
+			state = 3;
 			return;
 			break;
 	}
 
-	printOperation(operation);
-}
-
-void printOperation(char operation) {
-	oled_WriteString("Enter operation: ", Font_7x10, White);
-
-	oled_SetCursor(60, 15);
-	oled_WriteChar(operation, Font_7x10, White);
+	if(button != -1) {
+		printOperationText(operation);
+	}
 }
 
 
 void enterNumber(int* state) {
 	int button = getPressedButton();
 
-	if(0 <= button && button <= 9) {
-		int* num = *state == 0 ? &op1 : &op2;
+	int* num = *state == 0 ? &op1 : &op2;
 
-		*num = *num * 10 + button;
-
-		return;
+	if (button >= 0 && button <= 9) {
+	    if (*num > (INT_MAX - button) / 10) {
+	        *num = 0;
+	    } else {
+	        *num = *num * 10 + button;
+	    }
 	}
 
 	if(button == 10) {
-		int* num = *state == 0 ? &op1 : &op2;
-
 		*num = *num / 10;
+	}
+
+	if(button <= 10 && button != -1) {
+		redrawNumber(*num);
 
 		return;
 	}
 
 	if (button == 11) {
 		(*state)++;
+
+		if(*state == 1) {
+			printOperand(2, 0);
+		}
+
+		if(*state == 2) {
+			printOperation(operation);
+		}
+
+
 		return;
 	}
 }

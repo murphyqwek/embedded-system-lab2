@@ -99,16 +99,18 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART6_UART_Init();
-  /* USER CODE BEGIN 2 */
   oled_Init();
-
+  /* USER CODE BEGIN 2 */
+  printOperand(1, 0);
+  HAL_Delay(100);
+  UART_Transmit( (uint8_t*)"Printed!" );
   /* USER CODE END 2 */
- 
-  oled_Reset();
-  
+
+
   while (1)
   {
 	  cycle();
+	  oled_UpdateScreen();
 	  HAL_Delay(25);
 
   }

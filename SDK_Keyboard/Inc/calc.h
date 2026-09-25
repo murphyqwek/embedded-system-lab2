@@ -1,8 +1,6 @@
 #ifndef CALC
 #define CALC
 
-void printOperation(char operation);
-void printNum(int num);
 int getPressedButton(void);
 
 void clearWhenPressed(void);
