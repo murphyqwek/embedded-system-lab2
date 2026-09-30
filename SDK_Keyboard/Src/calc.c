@@ -43,7 +43,6 @@ void clearWhenPressed() {
 
 	if(button >= 0) {
 		state = 0;
-		op1 = 0;
 		op2 = 0;
 		operation = '+';
 		oled_Fill(Black);
@@ -72,6 +71,7 @@ void calculation(void)
             if (op2 == 0) {
                 printError("Division by zero");
                 state = 4;
+                op1 = 0;
                 return;
             }
 
@@ -81,6 +81,7 @@ void calculation(void)
         default:
             printError("Invalid operation");
             state = 4;
+            op1 = 0;
             return;
     }
 
@@ -88,6 +89,7 @@ void calculation(void)
         printError("Integer overflow");
     } else {
         printResult((int)result);
+        op1 = (int)result;
     }
 
     state = 4;
