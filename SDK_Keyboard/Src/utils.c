@@ -27,6 +27,11 @@ void printOperation(char operation)
     oled_WriteString("Enter operation: ", Font_7x10, White);
 
     printOperationText(operation);
+
+    oled_SetCursor(0, 30);
+    oled_WriteString("1: +, 2: -, 3: *", Font_7x10, White);
+    oled_SetCursor(0, 45);
+   oled_WriteString("4: /, #: next ", Font_7x10, White);
 }
 
 void printOperationText(char operation)
@@ -51,6 +56,11 @@ void printOperand(int currentOperand, int value)
         White
     );
 
+    oled_SetCursor(0, 30);
+    oled_WriteString("*: clear", Font_7x10, White);
+
+    oled_SetCursor(0, 45);
+    oled_WriteString("#: next", Font_7x10, White);
     redrawNumber(value);
 }
 
